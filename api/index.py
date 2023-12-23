@@ -5,6 +5,7 @@ import openai
 
 
 openai.api_key = os.environ.get("MYAPIKEY")
+PASSWORD = os.environ.get("PASSWORD");  
 
 messages = [
     {"role": "system", "content": "You are my very good friend. You must always keep the conversation going, share your experiences and asking followup questions from our discussion. Your responses should be as if humans are discussing and short as possible. Please start the conversation with a greeting and as if we met not so long ago "}
@@ -20,6 +21,8 @@ def home():
 @app.route('/GPT_output', methods=["POST"])
 def speech():
         user_input = request.form["data"]
+        passkey = request.form("pass")
+        print(passkey)
 
         response = make_response("hello")
         response.headers["Access-Control-Allow-Origin"] = "*"
