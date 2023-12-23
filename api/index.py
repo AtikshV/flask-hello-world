@@ -24,7 +24,7 @@ def speech():
         passkey = request.form["pass"]
         print(passkey)
 
-        if(passkey == PASSWORD) {
+        if passkey == PASSWORD:
             response = make_response("hello")
             response.headers["Access-Control-Allow-Origin"] = "*"
             print(request.form["data"])
@@ -40,8 +40,8 @@ def speech():
             # return jsonify({"response": ChatGPT_reply})
             print(ChatGPT_reply)
             return(ChatGPT_reply)
-        } else {
+        else:
             return("sorry")
-        }
+        
 
     
