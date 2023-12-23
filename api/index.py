@@ -10,7 +10,7 @@ def home():
     return "Hello, World!"
 
 
-@app.route('GPT_output')
+@app.route('/GPT_output')
 def GPT(): 
     return("Hello this is chatGPT here")
 
