@@ -4,7 +4,7 @@ import os
 import openai
 
 
-test = os.environ.get("MYAPIKEY")
+openai.api_key = os.environ.get("MYAPIKEY")
 
 messages = [
     {"role": "system", "content": "You are my very good friend. You must always keep the conversation going, share your experiences and asking followup questions from our discussion. Your responses should be as if humans are discussing and short as possible. Please start the conversation with a greeting and as if we met not so long ago "}
@@ -34,4 +34,5 @@ def speech():
         messages.append({"role": "assistant", "content": ChatGPT_reply})
         
         # return jsonify({"response": ChatGPT_reply})
+        print(ChatGPT_reply)
         return  (ChatGPT_reply)
