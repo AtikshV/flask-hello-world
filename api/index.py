@@ -21,7 +21,7 @@ def home():
 @app.route('/GPT_output', methods=["POST"])
 def speech():
         user_input = request.form["data"]
-        passkey = request.form("pass")
+        passkey = request.form["pass"]
         print(passkey)
 
         response = make_response("hello")
