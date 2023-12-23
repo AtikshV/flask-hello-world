@@ -24,18 +24,24 @@ def speech():
         passkey = request.form["pass"]
         print(passkey)
 
-        response = make_response("hello")
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        print(request.form["data"])
+        if(passkey == PASSWORD) {
+            response = make_response("hello")
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            print(request.form["data"])
 
-        messages.append({"role": "user", "content": user_input})
-        response = openai.ChatCompletion.create(
-            model = "gpt-3.5-turbo",
-            messages = messages
-        )
-        ChatGPT_reply = response["choices"][0]["message"]["content"]
-        messages.append({"role": "assistant", "content": ChatGPT_reply})
-        
-        # return jsonify({"response": ChatGPT_reply})
-        print(ChatGPT_reply)
-        return  (ChatGPT_reply)
+            messages.append({"role": "user", "content": user_input})
+            response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = messages
+            )
+            ChatGPT_reply = response["choices"][0]["message"]["content"]
+            messages.append({"role": "assistant", "content": ChatGPT_reply})
+            
+            # return jsonify({"response": ChatGPT_reply})
+            print(ChatGPT_reply)
+            return(ChatGPT_reply)
+        } else {
+            return("sorry")
+        }
+
+    
