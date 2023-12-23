@@ -12,7 +12,7 @@ def home():
     return "Hello, World!"
 
 
-@app.route('/GPT_output')
+@app.route('/GPT_output', methods=["POST"])
 def GPT(): 
     return("Hello this is chatGPT here")
 
