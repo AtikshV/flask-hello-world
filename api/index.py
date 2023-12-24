@@ -8,7 +8,7 @@ openai.api_key = os.environ.get("MYAPIKEY")
 PASSWORD = os.environ.get("PASSWORD");  
 
 messages = [
-    {"role": "system", "content": "You are my very good friend. You must always keep the conversation going, share your experiences and asking followup questions from our discussion. Your responses should be as if humans are discussing and short as possible. Please start the conversation with a greeting and as if we met not so long ago "}
+    {"role": "system", "content": "You are my very good friend. You must always keep the conversation going, share your experiences and asking followup questions from our discussion. Your responses should be as if humans are discussing and short as possible. Please start the conversation with a greeting and as if we met not so long ago. My name is "}
     ]
 app = Flask(__name__)
 CORS(app)
@@ -21,14 +21,17 @@ def home():
 @app.route('/GPT_output', methods=["POST"])
 def speech():
         user_input = request.form["data"]
+        
         passkey = request.form["pass"]
         print(passkey)
+
+        name = request.form["name"]
+        messages.append({"role": "system", "content": "My name is " + name + ".Try to refer to me by my name often. "})
 
         if passkey == PASSWORD:
             response = make_response("hello")
             response.headers["Access-Control-Allow-Origin"] = "*"
             print(request.form["data"])
-
             messages.append({"role": "user", "content": user_input})
             response = openai.ChatCompletion.create(
                 model = "gpt-3.5-turbo",
