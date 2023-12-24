@@ -26,7 +26,7 @@ def speech():
         print(passkey)
 
         name = request.form["name"]
-        messages.append({"role": "system", "content": "My name is " + name + "."})
+        messages.append({"role": "system", "content": "My name is " + name + ".Try to refer to me by my name often. "})
 
         if passkey == PASSWORD:
             response = make_response("hello")
