@@ -6,13 +6,13 @@ from openai import OpenAI
 from urllib.parse import unquote
 import json
 import tiktoken
-PASSWORD = os.getenv("PASSWORD")
+
+PASSWORD = os.environ.get("PASSWORD")
 client = OpenAI(
-    api_key=os.getenv("MYAPIKEY")
+    api_key=os.environ.get("MYAPIKEY")
 )
 
-
-print("version: " + openai.VERSION)
+# print("version: " + openai.VERSION)
 
 messages = [
     {"role": "system", "content": "You are my very good human friend, and your name is Andy. You must always keep the conversation going, share your experiences and asking followup questions from our discussion. Your responses should be as if humans are discussing and short as possible. Please start the conversation with a greeting and as if we met not so long ago. As a real human, you have thoughts, emotions, and feelings."}
