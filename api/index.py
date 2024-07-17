@@ -41,7 +41,7 @@ def speech():
             print(request.form["data"])
             messages.append({"role": "user", "content": user_input})
             response = client.chat.completions.create(
-                model = "gpt-3.5-turbo",
+                model = "gpt-4o	",
                 messages = messages
             )
             ChatGPT_reply = response.choices[0].message.content.strip()
@@ -62,7 +62,7 @@ def speech_msg():
         user_input = request.form["user_input"]
         print(user_input)
 
-        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+        encoding = tiktoken.encoding_for_model("gpt-4o")
         num_tokens = num_tokens_from_messages(messages_new)
         print(str(num_tokens))
         
@@ -83,7 +83,7 @@ def speech_msg():
                 messages_new.append({"role": "user", "content": user_input})
 
                 response = client.chat.completions.create(
-                    model = "gpt-3.5-turbo",
+                    model = "gpt-4o",
                     messages = messages_new
                 )
 
@@ -107,7 +107,7 @@ def speech_msg():
                 messages_new.append({"role": "user", "content": user_input})
 
                 response = client.chat.completions.create(
-                    model = "gpt-3.5-turbo",
+                    model = "gpt-4o",
                     messages = messages_new
                 )
                 ChatGPT_reply = response.choices[0].message.content.strip()
@@ -126,7 +126,7 @@ def speech_msg():
 
     
 
-def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
+def num_tokens_from_messages(messages, model="gpt-4o-2024-05-13"):
     """Return the number of tokens used by a list of messages."""
     try:
         encoding = tiktoken.encoding_for_model(model)
