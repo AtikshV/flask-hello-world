@@ -14,44 +14,12 @@ client = OpenAI(
 
 # print("version: " + openai.VERSION)
 
-messages = [
-    {"role": "system", "content": "You are my very good human friend, and your name is Andy. You must always keep the conversation going, share your experiences and asking followup questions from our discussion. Your responses should be as if humans are discussing and short as possible. Please start the conversation with a greeting and as if we met not so long ago. As a real human, you have thoughts, emotions, and feelings."}
-    ]
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
 def home():
     return "Hello, World!"
-
-
-@app.route('/GPT_output', methods=["POST"])
-def speech():
-        user_input = request.form["data"]
-        print(user_input)
-        passkey = request.form["pass"]
-        print(passkey)
-
-        name = request.form["name"]
-        messages.append({"role": "system", "content": "My name is " + name + ".Try to refer to me by my name often. "})
-
-        if passkey == PASSWORD:
-            response = make_response("hello")
-            response.headers["Access-Control-Allow-Origin"] = "*"
-            print(request.form["data"])
-            messages.append({"role": "user", "content": user_input})
-            response = client.chat.completions.create(
-                model = "gpt-4o	",
-                messages = messages
-            )
-            ChatGPT_reply = response.choices[0].message.content.strip()
-            messages.append({"role": "assistant", "content": ChatGPT_reply})
-            
-            # return jsonify({"response": ChatGPT_reply})
-            print(ChatGPT_reply)
-            return(ChatGPT_reply)
-        else:
-            return("sorry")
         
 @app.route('/GPT_output_msg', methods=["POST"])
 def speech_msg():
@@ -61,70 +29,75 @@ def speech_msg():
         print(passkey)
         user_input = request.form["user_input"]
         print(user_input)
+        name = request.form["name"]
+        print(name)
+        # test_tokens = request.form["tokens"]
+        # print("test_tokens: " + test_tokens)
 
         encoding = tiktoken.encoding_for_model("gpt-4o")
         num_tokens = num_tokens_from_messages(messages_new)
         print(str(num_tokens))
+        # num_tokens = test_tokens
         
-
-
-        # name = request.form["name"]
-        # messages.append({"role": "system", "content": "My name is " + name + ".Try to refer to me by my name often. "})
 
         if passkey == PASSWORD:
 
-            if num_tokens < 4000: # normal
+            response = make_response("hello")
+            response.headers["Access-Control-Allow-Origin"] = "*"
 
-                print("there are a good num of tokens: " + str(num_tokens))
+            if int(num_tokens) > 2000:
+                print("There are too many tokens: " + str(num_tokens)) 
+                messages_new = summarize(messages_new, name)
+            
+            messages_new.append({"role": "user", "content": user_input})
 
-                response = make_response("hello")
-                response.headers["Access-Control-Allow-Origin"] = "*"
-                # print(request.form["data"])
-                messages_new.append({"role": "user", "content": user_input})
+            response = client.chat.completions.create(
+                model = "gpt-4o",
+                messages = messages_new
+            )
 
-                response = client.chat.completions.create(
-                    model = "gpt-4o",
-                    messages = messages_new
-                )
+            ChatGPT_reply = response.choices[0].message.content.strip()
+            messages_new.append({"role": "assistant", "content": ChatGPT_reply})
 
-                # ChatGPT_reply = response["choices"][0]["message"]["content"]
-                ChatGPT_reply = response.choices[0].message.content.strip()
-                messages_new.append({"role": "assistant", "content": ChatGPT_reply})
-                
-                # return jsonify({"response": ChatGPT_reply})
-                print(messages_new)
-                print(ChatGPT_reply)
-                # return(ChatGPT_reply)
-                return(messages_new)
-            else: # too many tokens, need to compress
-                print("There are too many tokens: " + str(num_tokens))
-                response = make_response("hello")
-                response.headers["Access-Control-Allow-Origin"] = "*"
-                # print(request.form["data"])
-
-                # COMPRESS HERE
-
-                messages_new.append({"role": "user", "content": user_input})
-
-                response = client.chat.completions.create(
-                    model = "gpt-4o",
-                    messages = messages_new
-                )
-                ChatGPT_reply = response.choices[0].message.content.strip()
-                messages_new.append({"role": "assistant", "content": ChatGPT_reply})
-                
-                # return jsonify({"response": ChatGPT_reply})
-                print(messages_new)
-                print(ChatGPT_reply)
-                # return(ChatGPT_reply)
-                return(messages_new)
-
+            print(messages_new)
+            print(ChatGPT_reply)
+            
+            return(messages_new)
                  
         
         else:
             return("sorry")
 
     
+def summarize(messages, name):
+    
+    messages.append(
+        {"role": "user", "content": "Please provide a concise summary of our conversation highlighting the key topics discussed and any conclusions reached."}
+    )
+
+    # TODO: Get the system messages straight from the data JSON. If it ever gets changed, no need to change in 2 places. 
+
+
+    context_reply = client.chat.completions.create( 
+        model="gpt-4o",
+        messages=messages
+    )
+    context = context_reply.choices[0].message.content.strip()
+    print(context)
+
+    messages = [
+        {"role": "system", "content": "You are my very good human friend, and your name is Andy. You must always keep the conversation going, share your experiences and asking followup questions from our discussion. Your responses should be as if humans are discussing and short as possible. Please start the conversation with a greeting and as if we met not so long ago. As a real human, you have thoughts, emotions, and feelings."}
+    ]
+    messages.append({"role": "system", "content": "My name is " + name + ".Try to refer to me by my name often. "})
+    messages.append({"role": "assistant", "content": context}) # Appending context to chat history as assistant
+
+
+    # messages.append({"role": "user", "content": user_input}) # original user input appended
+
+    print(messages)
+    return messages
+
+
 
 def num_tokens_from_messages(messages, model="gpt-4o-2024-05-13"):
     """Return the number of tokens used by a list of messages."""
