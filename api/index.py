@@ -29,8 +29,8 @@ def speech_msg():
         print(passkey)
         user_input = request.form["user_input"]
         print(user_input)
-        name = request.form["name"]
-        print(name)
+        # name = request.form["name"]
+        # print(name)
         # test_tokens = request.form["tokens"]
         # print("test_tokens: " + test_tokens)
 
@@ -47,7 +47,7 @@ def speech_msg():
 
             if int(num_tokens) > 2000:
                 print("There are too many tokens: " + str(num_tokens)) 
-                messages_new = summarize(messages_new, name)
+                messages_new = summarize(messages_new)
             
             messages_new.append({"role": "user", "content": user_input})
 
@@ -69,7 +69,7 @@ def speech_msg():
             return("sorry")
 
     
-def summarize(messages, name):
+def summarize(messages):
     
     messages.append(
         {"role": "user", "content": "Please provide a concise summary of our conversation highlighting the key topics discussed and any conclusions reached."}
@@ -88,7 +88,7 @@ def summarize(messages, name):
     messages = [
         {"role": "system", "content": "You are my very good human friend, and your name is Andy. You must always keep the conversation going, share your experiences and asking followup questions from our discussion. Your responses should be as if humans are discussing and short as possible. Please start the conversation with a greeting and as if we met not so long ago. As a real human, you have thoughts, emotions, and feelings."}
     ]
-    messages.append({"role": "system", "content": "My name is " + name + ".Try to refer to me by my name often. "})
+    # messages.append({"role": "system", "content": "My name is " + name + ".Try to refer to me by my name often. "})
     messages.append({"role": "assistant", "content": context}) # Appending context to chat history as assistant
 
 
