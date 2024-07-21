@@ -23,83 +23,127 @@ def home():
         
 @app.route('/GPT_output_msg', methods=["POST"])
 def speech_msg():
-        messages_new = json.loads(unquote(request.form["data"]))
-        print(messages_new)
-        passkey = request.form["pass"]
-        print(passkey)
-        user_input = request.form["user_input"]
-        print(user_input)
-        # name = request.form["name"]
-        # print(name)
-        # test_tokens = request.form["tokens"]
-        # print("test_tokens: " + test_tokens)
+    messages_new = json.loads(unquote(request.form["data"]))
+    print(messages_new)
+    passkey = request.form["pass"]
+    print(passkey)
+    user_input = request.form["user_input"]
+    print(user_input)
+    # name = request.form["name"]
+    # print(name)
+    # test_tokens = request.form["tokens"]
+    # print("test_tokens: " + test_tokens)
 
-        encoding = tiktoken.encoding_for_model("gpt-4o")
-        num_tokens = num_tokens_from_messages(messages_new)
-        print(str(num_tokens))
-        # num_tokens = test_tokens
-        
-
-        if passkey == PASSWORD:
-
-            response = make_response("hello")
-            response.headers["Access-Control-Allow-Origin"] = "*"
-
-            if int(num_tokens) > 2000:
-                print("There are too many tokens: " + str(num_tokens)) 
-                messages_new = summarize(messages_new)
-            
-            messages_new.append({"role": "user", "content": user_input})
-
-            response = client.chat.completions.create(
-                model = "gpt-4o",
-                messages = messages_new
-            )
-
-            ChatGPT_reply = response.choices[0].message.content.strip()
-            messages_new.append({"role": "assistant", "content": ChatGPT_reply})
-
-            print(messages_new)
-            print(ChatGPT_reply)
-            
-            return(messages_new)
-                 
-        
-        else:
-            return("sorry")
-
+    encoding = tiktoken.encoding_for_model("gpt-4o-mini")
+    num_tokens = num_tokens_from_messages(messages_new, "gpt-4o-mini")
+    print(str(num_tokens))
+    # num_tokens = test_tokens
     
+
+    if passkey == PASSWORD:
+
+        response = make_response("hello")
+        response.headers["Access-Control-Allow-Origin"] = "*"
+
+        if int(num_tokens) > 2000:
+            print("There are too many tokens: " + str(num_tokens)) 
+            messages_new = summarize(messages_new)
+        
+        messages_new.append({"role": "user", "content": user_input})
+
+        response = client.chat.completions.create(
+            model = "gpt-4o-mini",
+            messages = messages_new
+        )
+
+        ChatGPT_reply = response.choices[0].message.content.strip()
+        messages_new.append({"role": "assistant", "content": ChatGPT_reply})
+
+        print(messages_new)
+        print(ChatGPT_reply)
+        
+        return(messages_new)
+                
+    
+    else:
+        return("sorry")
+        
+# @app.route('/test_msg', methods=["POST"])
+# def test_msg():
+#     messages_new = json.loads(unquote(request.form["data"]))
+#     print(messages_new[1]["content"])
+#     passkey = request.form["pass"]
+#     # print(passkey)
+#     user_input = request.form["user_input"]
+#     # print(user_input)
+#     # name = request.form["name"]
+#     # print(name)
+#     # test_tokens = request.form["tokens"]
+#     # print("test_tokens: " + test_tokens)
+
+#     encoding = tiktoken.encoding_for_model("gpt-4o-mini")
+#     num_tokens = num_tokens_from_messages(messages_new, "gpt-4o-mini")
+#     # print(str(num_tokens))
+#     # num_tokens = test_tokens
+    
+
+#     if passkey == PASSWORD:
+
+#         response = make_response("hello")
+#         response.headers["Access-Control-Allow-Origin"] = "*"
+
+
+#         messages_new = summarize(messages_new)
+
+        
+#         messages_new.append({"role": "user", "content": user_input})
+
+#         response = client.chat.completions.create(
+#             model = "gpt-4o-mini",
+#             messages = messages_new
+#         )
+
+#         ChatGPT_reply = response.choices[0].message.content.strip()
+#         messages_new.append({"role": "assistant", "content": ChatGPT_reply})
+#         # print(messages_new)
+#         # print(ChatGPT_reply)
+        
+#         return(messages_new)
+                
+    
+#     else:
+#         return("sorry")
+
+
 def summarize(messages):
+
+    system_msg = messages[0]["content"]
+    name_msg = messages[1]["content"]
+    print(system_msg)
+    print(name_msg)
     
     messages.append(
         {"role": "user", "content": "Please provide a concise summary of our conversation highlighting the key topics discussed and any conclusions reached."}
     )
 
-    # TODO: Get the system messages straight from the data JSON. If it ever gets changed, no need to change in 2 places. 
-
 
     context_reply = client.chat.completions.create( 
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=messages
     )
     context = context_reply.choices[0].message.content.strip()
     print(context)
 
-    messages = [
-        {"role": "system", "content": "You are my very good human friend, and your name is Andy. You must always keep the conversation going, share your experiences and asking followup questions from our discussion. Your responses should be as if humans are discussing and short as possible. Please start the conversation with a greeting and as if we met not so long ago. As a real human, you have thoughts, emotions, and feelings."}
-    ]
-    # messages.append({"role": "system", "content": "My name is " + name + ".Try to refer to me by my name often. "})
+    messages.append({"role": "system", "content": system_msg}) 
+    messages.append({"role": "system", "content": name_msg}) 
     messages.append({"role": "assistant", "content": context}) # Appending context to chat history as assistant
-
-
-    # messages.append({"role": "user", "content": user_input}) # original user input appended
 
     print(messages)
     return messages
 
 
 
-def num_tokens_from_messages(messages, model="gpt-4o-2024-05-13"):
+def num_tokens_from_messages(messages, model):
     """Return the number of tokens used by a list of messages."""
     try:
         encoding = tiktoken.encoding_for_model(model)
